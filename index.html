@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>TUM Social Gaming Praktikum by tum-social-gaming-praktikum</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>TUM Social Gaming Praktikum</h1>
+        <h2>Assignment 2</h2>
+        <a href="https://github.com/tum-social-gaming-praktikum/documentation" class="button"><small>View project on</small>GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
+<a name="aufgabe-2-rev-1" class="anchor" href="#aufgabe-2-rev-1"><span class="octicon octicon-link"></span></a>Aufgabe 2 (rev. 1)</h1>
+
+<p>Bemerkung: In dieser Aufgabenbeschreibung sind, sofern aus Gründen der Lesbarkeit männliche Bezeichner für Menschen benutzt werden, stets beide Geschlechter gemeint. </p>
+
+<h2>
+<a name="grunds%C3%A4tzlicher-gegenstand" class="anchor" href="#grunds%C3%A4tzlicher-gegenstand"><span class="octicon octicon-link"></span></a>Grundsätzlicher Gegenstand</h2>
+
+<p>In dieser Aufgabe soll die Implementierung ihres in der Aufgabe 1 erarbeiteten Konzepts eines Location-Based Mobile Social Game durchgeführt werden. Die einzige formale Anforderung ist, dass die mobile Anwendung für Android Geräte geschrieben sein muss. Hierbei wird es jedoch unumgänglich sein, einen Teil Ihrer Anwendung als zentralen Service (z.B. ein Server auf dem ein Webservice läuft) zu implementieren, um eben zentrale Daten wie Nutzerpositionen zu verwalten oder bidirektionale Gerätekommunikation zu ermöglichen.</p>
+
+<p>Um Ihnen die Implementierung zu erleichtern, haben wir eine Basisimplementierung erstellt, auf die Sie aufbauen können und die für ein sehr simples fiktives Spiel folgende, im Aufgabenteil 1 elaborierte Anforderungen erfüllt:</p>
+
+<ul>
+<li>Verwendung lokalitätsbezogener Daten des Nutzers und der Mitspieler als individueller Kontext des Nutzers</li>
+<li>Einbezug des long-term Social Contexts durch das soziale Netzwerk des Nutzers</li>
+<li>Einbezug des short-term Social Contexts durch eine momentan existierende Interaktionssituation und die Anwesenheit bestimmter weitere Mitspieler</li>
+</ul><h3>
+<a name="spieleablauf-der-beispielimplementierung" class="anchor" href="#spieleablauf-der-beispielimplementierung"><span class="octicon octicon-link"></span></a>Spieleablauf der Beispielimplementierung</h3>
+
+<p>Der Ablauf des Spiels ist in unserer Implementierung möglichst einfach gehalten: Nachdem geographische Daten (Geo-Locations/Positionen) des Nutzers und der Mitspieler sowie deren long-term Social Context (Freunde im sozialen Netzwerk) der Anwendung bekannt sind, kann ein Nutzer eine Anfrage für eine neues Spiel initiieren. Die Anwendung wählt daraufhin einen passenden Mitspieler aus, der Kriterien erfüllt, die auf der Basis des long &amp; short-term Social Contexts und des individuellen Kontexts der Nutzer formuliert werden sollen. Diese sind (sehr vereinfachend) in der Basisimplementierung:</p>
+
+<ul>
+<li>Bekanntschaft der Nutzer im Sozialen Netzwerk (in diesem Fall verwenden wir "befreundet", damit Sie die Implementierung einfacher testen können)</li>
+<li>Aktuelle geographische Nähe der Nutzer (innerhalb 100 Meter)</li>
+</ul><p>Nehmen beide Nutzer das Spiel an, so wird als darauf folgende Spieleaktion das zeitnahe, gleichzeitige Schütteln der Mobiltelefone der Nutzer erwartet. Dies gilt als Bestätigung des short-term Social Contexts und führt zur Bestimmung des Gewinners (zufällig) dieses Spiels. Dem Gewinner werden hierauf Punkte auf sein Benutzerkonto der Anwendung gutgeschrieben Falls eine Spielanfrage nicht angenommen wird, werden dem entsprechenden Nutzer Punkte abgezogen.</p>
+
+<p>Wie gesagt: Dies ist vom Spieldesign her nur ein sehr grobes Gerüst, von dem Sie abweichen können und sollen. </p>
+
+<h3>
+<a name="grober-infrastruktureller-aufbau-der-beispielimplementierung" class="anchor" href="#grober-infrastruktureller-aufbau-der-beispielimplementierung"><span class="octicon octicon-link"></span></a>Grober infrastruktureller Aufbau der Beispielimplementierung</h3>
+
+<p>Die Beispielimplementierung verwendet sowohl eine Android Applikation als auch einen Webservice. Hierbei fungiert die Android Applikation größtenteils als einfacher Client, der aktiv oder reaktiv mit dem Webservice interagiert. Sämtliche Spielentscheidungen werden auf dem Webservice getroffen, nicht nur aufgrund der wesentlich einfacheren globalen Zustandsabbildung des Spiels, sondern auch um Probleme hinsichtlich Sicherheit (Betrug durch einen modifizierten Client) oder Privatsphäre (Austausch von Nutzerdaten zwischen Clients) zu minimieren.</p>
+
+<p>Da der größte Teil der Spiele- und Verwaltungslogik im Webservice residiert, hat der Client hauptsächlich die Aufgabe als User Interface zu agieren, also auf externe Ereignisse zu reagieren oder weitere Ereignis(-ketten) im Webservice auszulösen. Dies entspricht der Rolle eines ThinClients (vgl. <a href="http://en.wikipedia.org/wiki/Thin_client">http://en.wikipedia.org/wiki/Thin_client</a>)</p>
+
+<p>Der Client kann hier direkte (synchrone) Anfragen ohne weiteres an den Webservice richten, jedoch setzen manche Schritte im Spieleverlauf (asynchrone) Anfragen an die Clients voraus. Dies ist nicht ohne weiteres möglich, da Mobilfunkanbieter keine festen IP-Adressen an Endgeräte vergeben, bzw.  IP-Adressen unter mehreren Endgeräten geteilt werden. Diese Problematik wird in der Beispielimplementierung umgangen, indem ein Push-Message Service verwendet wird (vgl. <a href="http://en.wikipedia.org/wiki/Push_technology">http://en.wikipedia.org/wiki/Push_technology</a>). Entsprechende Nachrichten werden durch den Webservice initiiert und 
+an einen weiteren, cloudbasierten Webservice weitergeleitet, der weitere Infrastruktur und Mechanismen bereitstellt, um diese an die spezifischen Geräte zuzustellen.</p>
+
+<h3>
+<a name="bereitgestellte-funktionen" class="anchor" href="#bereitgestellte-funktionen"><span class="octicon octicon-link"></span></a>Bereitgestellte Funktionen</h3>
+
+<p>Der Webservice verwaltet Nutzer- , soziale Netzwerk-, Geräte- und Spielverlaufsdaten in einer Datenbank, die unter anderem auch Anfragen mit geographischen Daten erlaubt. Durch diese Kombination werden folgende Funktionalitäten auf Seiten des Webservices ermöglicht, die der Client direkt erfragen, initieren oder indirekt durch den Spieleverlauf verändern kann:</p>
+
+<ul>
+<li>Einloggen/Registrierung neuer Mitspieler und Aggregation sozialer Netzerwerkdaten</li>
+<li>Aktualisierung der Geolocations der Nutzer in der Datenbank durch Client-Updates</li>
+<li>Abfrage befreundeter Mitspieler in der unmittelbaren Umgebung</li>
+<li>Initierung eines Spiels und Auswahl eines passenden Mitspielers unter Berücksichtigung seines geographischen und sozialen Kontexts</li>
+<li>Senden, Annehmen und Abbrechen einer Spieleanfrage an bzw. durch die beteiligten Mitspieler</li>
+<li>Auswerten der kurzen sozialen Interaktion beider Mitspieler</li>
+<li>Implementierung der Spielelogik und Verwaltung des Nutzerkontos für die Bepunktung</li>
+<li>Führen der globalen Spielestatistik und Verwaltung der Spielezustände</li>
+<li>Verwaltung von Geräteinformationen für den Push Nachrichtenservice</li>
+<li>Senden von Nachrichten an Geräte mittels Push Service</li>
+</ul><p>Entsprechend reduziert fallen die notwendigen bereitgestellten Funktionen für den Client aus:</p>
+
+<ul>
+<li> Senden einer Spieleanfrage</li>
+<li> Darstellung von Dialogen für den Spieleverlauf und konditionelles Versenden von weiteren Nachrichten an den Webservice</li>
+<li> Auslesen des Beschleunigungssensors und Bewertung der erhaltenen Messwerte für die soziale Interaktion</li>
+<li> Empfang und Verarbeitung von Nachrichten des Push Services (in ihrem Design können / sollen Sie natürlich auch andere Sensoren des Mobilgeräts verwenden)</li>
+</ul><p>Desweiteren bietet die Basisimplementierung weitere Funktionen an, die sich bei der Implementierung Ihrer Anwendung als hilfreich erweisen können:</p>
+
+<ul>
+<li>Darstellung aller Position von befreundeten Nutzern auf einer interaktiven Karte auf dem Client</li>
+<li>Unidirektionale Kommunikation zwischen Nutzern im nahen Umfeld ( "anstupsen" )</li>
+</ul><p>Abbildungen 1a und 1b zeigen hierbei Screenshots der Implementation des Clients für einige der bereitgestellten Funtionen.
+Abbildung 1a beinhaltet hier die Hauptansichten, das sogenannte MainFragment mit dem Button, ein Spiel zu erfragen, sowie zusätzliche Logging-Ausgabe. Weiterhin ist eine Kartenansicht mit den beteiligten Mitspielern (in diesem Fall, die eigene Position und die eines Mitspielers) abgebildet. Der letzte Screenshot zeigt die Spielestatistik.  </p>
+
+<p><img src="screens.png" alt="Abbildung 1a: Screens im Spiel" title="Abbildung 1a: Screens im Spiel"></p>
+
+<p>Abbilding 1b beinhaltet hierbei einige Beispiele der Dialoge, die im Spiel verwendet werden; in diesem Fall für den erhaltenen Spielerequest, die Interaktion und die Funktion einen Mitspieler anzustupsen.</p>
+
+<p><img src="dialogs.png" alt="Abbildung 1b: Dialoge im Spiel" title="Abbildung 1b: Dialoge im Spiel"></p>
+
+<h2>
+<a name="verwendete-technologien-und-deren-motivation" class="anchor" href="#verwendete-technologien-und-deren-motivation"><span class="octicon octicon-link"></span></a>Verwendete Technologien und deren Motivation</h2>
+
+<p>Die Hauptmotivation bei der Auswahl der verwendeten Technologien, aber auch der Implentierungsdetails, ist es, Ihnen verbreitete, bewährte und einfach zu nutzende Tools an die Hand zu geben, die  sehr gut durch die Nutzer- und Entwickler-Communities unterstützt werden. Das heisst, dass viele Lösungen für eventuell auftretende Teilprobleme auf entsprechenden Platformen (Foren, Stackoverflow, Mailinglisten) bereits zu finden sind oder diskutiert wurden. Wir ermutigen Sie hiermit also auch, derartige Quellen zu verwenden. Wird Code von externen Quellen oder anderen Gruppen übernommen müssen Sie dies allerdings dokumentieren ('zitieren'). Eine weitere Motivation für die gewählten Technologien ist, dass sie einen minimalen Installations- bzw. Einrichtungsaufwand mit sich bringen und darauf ausgerichtet sind, eine zügige Entwicklung mit minimalen Overhead zu gestatten (vgl. Lean Software Development <a href="http://en.wikipedia.org/wiki/Lean_software_development">http://en.wikipedia.org/wiki/Lean_software_development</a>).</p>
+
+<p>Ihnen ist freigestellt, andere Technologien zu verwenden, sofern dies ausreichend dokumentiert ist. Wir können Ihnen dafür jedoch keine aktive Unterstützung bieten.</p>
+
+<p>Der Client ist für Android 4.1+ implementiert, der Webservice verwendet das Play Framework 2.2, beide Komponenten machen demnach von der Programmiersprache Java Gebrauch - mit dieser hatten Sie im Laufe Ihres Studiums hinreichend Kontakt. </p>
+
+<p>Die Client-Server Architektur folgt den Prinzipien eines modernen RESTful Services (<a href="http://en.wikipedia.org/wiki/Representational_state_transfer">http://en.wikipedia.org/wiki/Representational_state_transfer</a>), d.h. sie folgt der Idee der Separation of Concerns, so dass:</p>
+
+<ul>
+<li>Der Client keine Speicherung von Spiele/Nutzerdaten durchführt (dies ist Aufgabe des Webservices)</li>
+<li>Der Webservice keine darstellenden oder interaktiven Komponenten verwaltet</li>
+<li>Der Webservice insofern zustandlos ist, dass er keine Buchführung der Zustände der Clients macht</li>
+</ul><p>Der Austausch von Daten zwischen Client und Server erfolgt in allen Fällen mit Hilfe des JSON Datenformats (<a href="http://www.json.org/">http://www.json.org/</a>),
+direkte Anforderungen des Clients werden als HTTP GET/POST (<a href="http://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol">http://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol</a>) Requests an den Webservice gerichtet. Asynchrone Nachrichten vom Webservice and die Clients werden durch den Push Service (Google Cloud Messaging Service) durchgeführt.</p>
+
+<h3>
+<a name="social-network-facebook" class="anchor" href="#social-network-facebook"><span class="octicon octicon-link"></span></a>Social Network: Facebook</h3>
+
+<p>Facebook ist die wohl (noch) am weitesten verbreitete Social Networking Plattform. Zum Zugriff auf Elemente von Facebook gibt es verschiedene APIs an die wir nutzen werden. Wir verwenden für die Entwicklung sowohl das offizielle Android Entickler Framework verwended (Facebook Android SDK, <a href="https://developers.facebook.com/docs/android/">https://developers.facebook.com/docs/android/</a>) als auch restFB (<a href="http://restfb.com/">http://restfb.com/</a>)  für die Webservice Seite, da es kein offizielles Entwicklerframework von Facebook ausserhalb mobiler Anwendungen gibt. Beide Frameworks sind gut dokumentiert und werden aktiv genutzt und weiterentwickelt. Falls Sie kein Mitglied bei Facebook sind, oder Ihren persönlichen Account nicht für das Praktikum nutzen möchten, können Sie sich für das Praktikum ein eigenes Konto ohne persönliche Informationen anlegen. Ihnen ist freigestellt, ob sie eine andere Social Networking Platform verwenden (z.B. Diaspora) oder entsprechende eigene Funktionen auf dem Webservice implementieren. Wir können Ihnen hierfür jedoch keine Unterstützung anbieten. </p>
+
+<h3>
+<a name="webservice-play-framework" class="anchor" href="#webservice-play-framework"><span class="octicon octicon-link"></span></a>Webservice: Play Framework</h3>
+
+<p>Das Play Framework (<a href="http://www.playframework.com/">http://www.playframework.com/</a>) ist ein Open Source Framework zur Entwicklung von Webservices. Es bietet dabei einen vollen Entwicklerstack an: unter anderem Web Applikation, Compiler, Web Server, Datenbank, Cache Management, Dependency Management, Asynchronous I/O und Unit Testing. Play verwendet hier auch Hot Code Reloading, d.h. sobald der Quellcode verändert wurde, wird er compiliert und in die laufende Applikation eingebunden; somit können Sie den Webservice im laufenden Betrieb weiterentwickeln und testen. Da der Webserver in Play standardmäßig eingebunden ist, entfallen die entsprechenden Einrichtungs- und Installationsschritte. Das integrierte Dependency Management lädt dabei externe Libraries automatisch aus bekannten Paketquellen nach, wie Sie es beim Ausführen der Beispielimplementierung sehen werden. Weiterhin können Sie Play Projekte als Eclipse, Intellij Idea oder Netbeans Projekte exportieren, um ihre Entwicklungsumgebung konsistent zu halten. Weiterhin benötigt die Installation und Ausführung eines Webservices keinerlei zusätzliche Konfiguration und Anpassungen Ihres Betriebssystems/Laufzeitumgebung. Auch hier ist die Dokumentation auf der Projektsite sehr gut und edukativ.</p>
+
+<h3>
+<a name="datenbank-monogdb" class="anchor" href="#datenbank-monogdb"><span class="octicon octicon-link"></span></a>Datenbank: MonogDB</h3>
+
+<p>Um Datenbankanfragen bezüglich Geo-Locations (also 2-dimensionale Indices als Kugelkoordinaten) durchführen zu können sind idR. spezielle Datenbanken oder Datenbankerweiterungen notwendig. Klassisch werden hierfür PostGIS, eine Erweiterung der Postgres Datenbank um Geo-Funktionen, oder Oracle Spatial verwendet. Der Nachteil für dieses Praktikum ist der vergleichsweise hohe Einrichtungsaufwand und die Verwendung von speziellen SQL Syntaxen/Funktionen, die in den gängigen objektrelationalen Mappern nicht abgedeckt werden, also eine "manuelle" Eingabe der SQL-Requests erfordern. </p>
+
+<p>MongoDB (<a href="https://www.mongodb.org/">https://www.mongodb.org/</a>) unterstützt als prominentester Vertreter der NoSQL Datenbanken Geospatial Indices erst seit Kurzem. Der Funktionsumfang ist diesbezüglich limitierter, aber für dieses Praktikum ausreichend. Für die Wahl entscheidend war vor allem die Installationsprozedur, die keinerlei zusätzliche Konfiguration oder Anpassungen Ihres Betriebssystems/ Ihrer Laufzeitumgebung benötigt. Daten werden bei MongoDB nicht relational hinterlegt, sondern als Dokumente verwaltet, die Datenbank orientiert sich somit eher an Datenstrukturen, die sie aus dem Programmieralltag kennen. Für die Kommunikation des Webservices mit der Datenbank
+wird hier Jongo (<a href="http://jongo.org/">http://jongo.org/</a>) verwendet, da die API hier benutzerfreundlicher ist, als die eigene Java API, die mit MongoDB mitgeliefert wird. Somit verwendet der Webservice <em>nicht</em> die mit dem Play Framework mitgelieferten Funktionen bzw. objektrelationalen Mapper zur Datenbankanbindung. Wie Sie in der Beispielimplementierung sehen werden, ist die Datenbankanbindung trotzdem sehr schlank möglich.   </p>
+
+<p>Die Dokumentation der MonogDB-Funktionen ist sehr gut, die von Jongo ist ausreichend, jedoch lassen sich Beispiele auf der MongoDB Site direkt als Jongo-basierter Request umsetzen.</p>
+
+<h3>
+<a name="push-service-google-play-service" class="anchor" href="#push-service-google-play-service"><span class="octicon octicon-link"></span></a>Push Service: Google Play Service</h3>
+
+<p>Die Verwendung des Google eigenen cloudbasierten Push Message Services (<a href="http://developer.android.com/google/gcm/index.html">http://developer.android.com/google/gcm/index.html</a>) bedingt sich aus der Wahl von Android als Entwicklungsumgebung für die mobile Anwendung.  </p>
+
+<h3>
+<a name="map-data-openstreetmaps" class="anchor" href="#map-data-openstreetmaps"><span class="octicon octicon-link"></span></a>Map Data: OpenStreetMaps</h3>
+
+<p>Die Wahl, OpenStreetMaps als Kartenmaterial (<a href="http://www.openstreetmap.org">http://www.openstreetmap.org</a>) und die Kartendarstellung mittels OSMDroid (<a href="https://code.google.com/p/osmdroid/">https://code.google.com/p/osmdroid/</a>) für die Clientanwendung zu verwenden, ist hauptsächlich durch die Restriktionen (Traffic und Request Quotas) der Verwendung des Google-eigenen Kartenservices motiviert. Bezüglich Qualität des Kartenmaterials für Mitteleuropa und Basisfunktionalität der Kartendarstellung stehen OpenSteetMaps GoogleMaps in nichts nach. Die Dokumentation von OSMDroid ist nicht komplett vollständig, jedoch finden sich auf Stackoverflow hinreichend Beispiele. </p>
+
+<h2>
+<a name="kommunikationsabl%C3%A4ufe" class="anchor" href="#kommunikationsabl%C3%A4ufe"><span class="octicon octicon-link"></span></a>Kommunikationsabläufe</h2>
+
+<p>Um Ihnen die Einarbeitung in die Beispielimplementierung zu erleichtern, werden in diesem Abschnitt einige Kommunikationsabläufe in der Applikation beispielhaft erläutert. </p>
+
+<p>Wie zuvor dargelegt, verwendet die Implementierung zwei Kommunikationsschemata, einerseits die direkte Kommunikation mit dem Webservice, die durch den Client initiiert wird und andererseits die Google Cloud Messaging basierte Push Kommunikation, die durch den Webservice initiiert wird, um dem Client bspw. Spielereignisse mitzuteilen.
+Dies ist schematisch in der Abbildung 1 dargestellt.
+<img src="push.png" alt="Abbildung 2: Kommunikationskanäle" title="Abbildung 1: Kommunikationskanäle"></p>
+
+<p>Die einzelnen Funktionen, die der Webservice bereitstellt, sind für Clients über einzelne URLs erreichbar. Als User-ID, der zur Identifikation der Nutzer dient, wird direkt die Facebook-ID des Nutzers verwendet. Dies hat den Vorteil, dass sowohl Client als auch Server sich nicht um ein zusätzliches Mapping von Nutzerprofildaten auf eindeutigen Nutzer-IDs kümmern müssen. </p>
+
+<p>Der Webservice bietet für das Spiel folgende Funktionen an, wobei Parameter in der URL mit ":parametername" bezeichnet werden:</p>
+
+<ul>
+<li>HTTP POST /users/:facebookAuthenticationToken/:GoogleCloudMessagingDeviceID/:longitude/:latitude/login - Client-Login bei dem Webservice, um sich für das Spiel anzumelden bzw. zu registrieren. Hier werden alle notwendigen Informationen übertragen, damit der User am Spiel teilnehmen kann.</li>
+<li>HTTP POST /positions/:facebookID/:longitude/:latitude/update - der Client verwendet diese Funktion des Webservers, um seine neue Position mitzuteilen.</li>
+<li>HTTP GET /users/:facebookID/getNearbyUsers - Hiermit kann der Client andere Nutzer in der Umgebung erfragen (dies wird für die Kartendarstellung beim CLient verwendet)</li>
+<li>HTTP POST /games/:facebookID/requestNew - Sendet eine Anfrage, um ein neues Spiel zu beginnen. Der Webservice wird daraufhin einen geeigneten Gegner für das Spiel ermitteln. Die Benachrichtigung der Clients für ein neues Spiel erfolgt dann über den Push Message Service, wobei dem Client ein Spiele-ID (gameID) mitgeteilt wird, um das Spiel eindeutig zu identifizieren.</li>
+<li>HTTP POST /games/:gameID/:facebookID/abort - Signalisiert dem Webserver, dass das Spiel mit dem entsprechenden Spiele-ID vom User mit dem entsprechenden Facebook-ID abgebrochen wird. Beiden Nutzern werden dann Nachrichten über den Push Message Service zugesendet, die über den Abbruch des Spiels informieren. Falls ein Nutzer das Spiel nicht annimmt, werden ihm Punkte abgezogen.</li>
+<li>HTTP POST /games/:gameID/:facebookID/accept - Signalisiert dem Webserver, dass das Spiel durch den ensprechenden Nutzer angenommen wurde. Wenn beide Nutzer das Spiel angenommen haben, werden diese über das zustande gekommende Spiel per Push Message Service informiert. Die Clients werden nun die Nutzer zur durchführung der Interaktion anleiten.</li>
+<li>HTTP POST /games/:gameID/:facebookID/interaction - Informiert den Webservice, dass einer der Nutzer eine Interaktion durchgeführt hat. Haben dies beide Nutzer durchgeführt, so werden diese über den Spielestand (gewonnen/verloren) per Push Message Service informiert.</li>
+<li>HTTP POST /games/:senderFacebookID/:receiverFacebookID/poke - Sendet einem anderen Nutzer per Push Message Service eine Nachricht, dass er/sie "angestupst" wurde.</li>
+</ul><p>Der Login-Prozess ist hierbei der komplexeste Vorgang des Spielverlaufes, da er weitere Parteien (Webservices) involviert. Abbildung 2 zeigt hier schematisch den Ablauf.</p>
+
+<p><img src="auth.png" alt="Abbildung 3: Anmeldungsprozess beim Webservice" title="Abbildung 2: Anmeldungsprozess beim Webservice"></p>
+
+<p>Der Anmeldeprozess wird durch den Client initiiert. Für den Spieleablauf ist es notwendig, dass der Webservice die Gerätekennung beim Google Cloud Messaging Service kennt, damit diesem Gerät zu einem späteren Zeitpunkt Push Messages geschickt werden können. Überdies ist es notwendig, dass der Webservice die Freundesliste des Nutzers von Facebook erfragen kann, um Information über den long-term Social Context zu haben. Es ist dabei zu beachten,
+dass die Beispielimplementierung keinen Unterschied zwischen Login und Registrierung macht, die Nutzerdaten werden entweder neu angelegt bei erstmaliger Anmeldung oder aktualisiert, so dass Änderungen der Freundesliste bei Facebook dem Spiel nach einem neuen Login bekannt sind. Der Ablauf der Anmeldung ist hierbei folgender:</p>
+
+<ol>
+<li>Der Client meldet sich bei dem Google Cloud Messaging Service an und erhält dabei eine eigene ID zur Geräteidentifikation.</li>
+<li>Der Client meldet sich bei Facebook an. Beim erstmaligen Starten der Clientapplikation muss der Nutzer zustimmen, dass die Clientapplikation Zugriff auf die Facebook-Nutzerdaten erhält. Sobald dies geschehen ist, erhält die Applikation ein Token zur Authentifizierung bei Facebook. Dieses Token kann für zukünftige Zugriffe auf die Nutzerdaten verwendet werden, es werden dabei keine zusätzlichlichen Account-Daten des Nutzers notwendig. </li>
+<li>Der Client sendet sowohl die Device-ID, das Facebook-Authentifizierungstoken und die aktuelle Position an den Webservice.</li>
+<li>Der Webservice kann nun, ermächtigt durch das Authentifizierungstoken, in der Rolle des Nutzers der Client-Applikation bei Facebook die Nutzerdaten erfragen und so die Freundesliste lokal in der Datenbank hinterlegen.</li>
+</ol><h2>
+<a name="toolchain-und-projekteinrichtung" class="anchor" href="#toolchain-und-projekteinrichtung"><span class="octicon octicon-link"></span></a>Toolchain und Projekteinrichtung</h2>
+
+<p>Die folgende Sektion soll Ihnen einen Überblick darüber geben, wie Sie die Beispielimplementierung zum Laufen bringen können, damit Sie darauf aufbauend Ihre eigene Implementation durchführen können. Es wird (gerade im Hinblick auf aufkommende Fragen) dringend empfohlen, sich zunächst mit der angegebene einführende oder weiterführende Literatur bzw. Dokumentation zu beschäftigen, bevor Fragen geposted werden.</p>
+
+<h3>
+<a name="herunterladen-der-quellcodes" class="anchor" href="#herunterladen-der-quellcodes"><span class="octicon octicon-link"></span></a>Herunterladen der Quellcodes</h3>
+
+<p>Sowohl der Webservice als auch der Client sind als Quellen auf unseren öffentlichen Repositories bei GitHub Verfügbar:  <a href="https://github.com/tum-social-gaming/">https://github.com/tum-social-gaming/</a></p>
+
+<p>Für die Versionsverwaltung verwenden wir entsprechend git, welches von <a href="http://git-scm.com/downloads">http://git-scm.com/downloads</a> heruntergeladen wird. Alternativ gibt es für Windows-Nutzer einen komfortablen GUI Client direkt für github unter <a href="https://windows.github.com/">https://windows.github.com/</a>. Für den folgenden Abschnitt werden wir uns aber auf die Verwendung von git aus dem Terminal heraus beschränken. Eine sehr gute Einführung für git und dessen Verwendung als Version Control System ist auf <a href="http://git-scm.com/book">http://git-scm.com/book</a> verfügbar.</p>
+
+<p>Das Repository des Webservices ist unter folgender URL zu erreichen <a href="https://github.com/tum-social-gaming/SocialGamingServer.git">https://github.com/tum-social-gaming/SocialGamingServer.git</a> und kann entsprechend mit folgendem Terminalkommando heruntergeladen werden:</p>
+
+<blockquote>
+<p>git clone <a href="https://github.com/tum-social-gaming/SocialGamingServer.git">https://github.com/tum-social-gaming/SocialGamingServer.git</a></p>
+</blockquote>
+
+<p>Äquivalent hierzu ist das Repository die Client-Applikation unter <a href="https://github.com/tum-social-gaming/SocialGamingClient.git">https://github.com/tum-social-gaming/SocialGamingClient.git</a> verfügbar und kann mit </p>
+
+<blockquote>
+<p>git clone <a href="https://github.com/tum-social-gaming/SocialGamingClient.git">https://github.com/tum-social-gaming/SocialGamingClient.git</a></p>
+</blockquote>
+
+<p>heruntergeladen werden. Bei dem Quellcode für den Webservice handelt es sich um ein eigenes Play Framework-Projekt, welches Sie direkt mit den Play Framework Tools starten können; Sie brauchen hierfür also keine IDE (sie <em>können</em> jedoch eine verwenden). Die Abschnitte MongoDB und Play Framework erläutern genauer, wie Sie den Quellcode ausführbar machen können. Bei den Quellen für den SocialGamingClient sind die Eclipse Projektdateien mitgeliefert.</p>
+
+<h3>
+<a name="mongodb" class="anchor" href="#mongodb"><span class="octicon octicon-link"></span></a>MongoDB</h3>
+
+<p>Die Installation der Datenbank gestaltet sich einfach, da sie lediglich unter <a href="http://www.mongodb.org/downloads">http://www.mongodb.org/downloads</a> das entsprechende Paket für ihre Platform herunterladen, dieses entpacken und das enthaltene
+Executable starten müssen. MongoDB legt dabei die Datenbank in ein Standardverzeichnis ab, dieses ist plattformspezifisch und muss unter Umständen noch angelegt werden. Alternativ kann ein anderes als Programmparameter übergeben werden. Genaueres finden Sie unter <a href="http://docs.mongodb.org/manual/installation/">http://docs.mongodb.org/manual/installation/</a>. MongoDB bietet auch eine Konsole an, mit der Sie auf die Datenbank mittels JavaScript zugreifen können. Dies kann sich als nützlich erweisen, falls Sie die hinterlegten Daten manuell verifizieren bzw. verändern möchten (vgl. <a href="http://docs.mongodb.org/manual/tutorial/getting-started/">http://docs.mongodb.org/manual/installation/</a>).</p>
+
+<h3>
+<a name="play-framework" class="anchor" href="#play-framework"><span class="octicon octicon-link"></span></a>Play Framework</h3>
+
+<p>Ähnlich einfach wie die Installation der Datenbank geht auch die des Play Frameworks von statten. Es wird empfohlen die Classic Distribution unter <a href="http://www.playframework.com/download">http://www.playframework.com/download</a> für Ihre Platform herunterzuladen. Unsere Beispielimplementierung wurde mit Play 2.2.1 getestet. Wenn Sie die Distribution entpackt haben und ihre Java und MongoDB Installation gültig ist, dann können Sie direkt in das Quellverzeichnis des Webservices wechseln und dort mit dem Ausführen des Kommandos:</p>
+
+<blockquote>
+<p>../Pfad/Zur/PlayInstallation/play ~run</p>
+</blockquote>
+
+<p>den Webservice starten. Dieser sollte auf localhost unter dem Port 9000 verfügbar sein. Wenn sie diese Adresse im Browser öffnen, sollten die aktuellen Spielstatistiken angezeigt werden. Genaueres zur Installation und die ersten Schritte mit Play sind unter <a href="http://www.playframework.com/documentation/2.2.x/Home">http://www.playframework.com/documentation/2.2.x/Home</a> ausführlichst dokumentiert.</p>
+
+<p>Für die Verwendung einer Entwicklungsumgebung werden die entsprechenden Schritte unter <a href="http://www.playframework.com/documentation/2.1.x/IDE">http://www.playframework.com/documentation/2.1.x/IDE</a> erläutert. Sie brauchen bei der IDE keine Build bzw. Runkonfigurationen angeben, da das play Kommando ein automatisches Build-Tool beinhaltet und veränderter Quellcode automatisch compiliert und die laufende Applikation aktualisiert wird.</p>
+
+<h3>
+<a name="android-entwicklungsumgebung" class="anchor" href="#android-entwicklungsumgebung"><span class="octicon octicon-link"></span></a>Android Entwicklungsumgebung</h3>
+
+<p>Das Aufsetzen der Android Entwicklungsumgenung gestaltet sich etwas umfangreicher als die Installationen zuvor, es wird entsprechend nahegelegt, dass Sie sich im Bedarfsfall mit der Dokumentation unter <a href="http://developer.android.com/sdk/index.html">http://developer.android.com/sdk/index.html</a> ausreichend auseinandersetzen. Als Entwicklungsumgebung stehen mittlerweile Eclipse + Android Developer Tools oder Android Studio zur verfügung. Wir empfehlen aus Konsistenzgründen Eclipse + Android Developer Tools, vor allem, da die Dokumentation der Google-eigenen Developer Tools aber auch des Facebook SDKs sich auf diese Umgebung beziehen.</p>
+
+<p>Desweiteren muss auch das Facebook SDK und Google Play SDK für eben diese beiden Umgebungen installiert werden (siehe nächste Unterabschnitte).</p>
+
+<p>Das Repository der Client Applikation sollten Sie in ihr Eclipse + ADT Projektverzeichnis importieren können, die entsprechenden Abhängigkeiten zum Google Play SDK und Facebook SDK müssen Sie jedoch manuell einrichten. </p>
+
+<h3>
+<a name="google-developer--google-cloud-messaging" class="anchor" href="#google-developer--google-cloud-messaging"><span class="octicon octicon-link"></span></a>Google Developer / Google Cloud Messaging</h3>
+
+<p>Da die Beispielimplementierung den Google-eigenen Push Service verwendet ist es notwendig, einen eigenen Google Entwickler Account anzumelden und ein Google Projekt einzurichten, welches diesen Service verwendet.
+Unter <a href="http://developer.android.com/google/gcm/gs.html">http://developer.android.com/google/gcm/gs.html</a> sind die notwendigen Einrichtungsschritte beschrieben.</p>
+
+<p>Weiterhin muss das Google Play SDK in das Eclipse Projekt eingebunden werden. Hierzu müssen Sie das Google Play SDK auf der mobilen Platform und für ihre IDE installieren. Genaueres findet sich unter <a href="http://developer.android.com/google/play-services/setup.html">http://developer.android.com/google/play-services/setup.html</a>. </p>
+
+<p><strong>Hinweis:</strong> Es kann sein, dass Ihre Anwendung mehr Nachrichten pro Sekunde pro Nutzer versendet, als die Standardeinstellung für den Google Push Message Service als Quota zulässt. Sie können diese in der Google Developer Console für ihr Projekt unter dem Menüpunkt APIs &amp; auth/APIs/Google Cloud Messaging for Android/Quota ändern. </p>
+
+<h3>
+<a name="facebook-app-developer" class="anchor" href="#facebook-app-developer"><span class="octicon octicon-link"></span></a>Facebook App Developer</h3>
+
+<p>Damit die Client Applikation im Namen des Nutzers auf Facebook Nutzerprofile zugreifen kann, ist es notwendig diese 
+bei <a href="https://developers.facebook.com">https://developers.facebook.com</a> einzurichten bzw. anzumelden. Hierfür brauchen sie wiederum (im Team) Facebook Entwickler Accounts. Diese erhält man nur, wenn ihre Facebook Accounts verifiziert sind, siehe hierzu <a href="https://www.facebook.com/help/167551763306531">https://www.facebook.com/help/167551763306531</a>. </p>
+
+<p>Die Anmeldung einer neuen Facebook "App" ist unter <a href="https://developers.facebook.com/docs/android/login-with-facebook/">https://developers.facebook.com/docs/android/login-with-facebook/</a> zu finden.</p>
+
+<p>Die genaue Einrichtungsprozedur, um das Android SDK einzurichten, wird unter <a href="https://developers.facebook.com/docs/android/getting-started/">https://developers.facebook.com/docs/android/getting-started/</a> ausführlich beschrieben; besonders wichtig ist der Unterpunkt "Link to the SDK project and configure the Facebook app ID" im Abschnitt 6, wobei der Facebook App ID bei unserem Client in der Datei Configuration.java zu setzen ist (siehe Abschnitt "Konfiguration des Webservice und Clients").</p>
+
+<p><strong>WICHTIG:</strong> Solange eine Facebook App nicht offiziell öffentlich zugänglich ist (was für dieses Praktikum der Fall sein wird), müssen Geräte, die diese App verwenden, Facebook bekannt sein. In der Facebook Dokumentation zum SDK wird hierbei von "KeyHashes" gesprochen, diese ist pro Gerät/Facebook App eindeutig und muss entsprechend im Dashboard für ihre Facebook App eingetragen sein. Wie man den KeyHash für ein Gerät erfragen kann ist unter <a href="https://developers.facebook.com/docs/android/getting-started">https://developers.facebook.com/docs/android/getting-started</a> im Unterpunkt 4 dokumentiert. Aus Komfortgründen gibt die Client Applikation diesen KeyHash auch im Applikations-Log innerhalb der Entwicklungsumgebung (Eclipse + ADT) aus. </p>
+
+<p><strong>WICHTIG:</strong> Um Ihre Applikation mit anderen Nutzern zu testen, müssen diese als Entwickler oder Test-User bekannt sein. Im Dashboard der Applikation, unter dem Menupunkt "Roles" können Sie weitere Nutzer Ihrem Projekt hinzufügen.</p>
+
+<h3>
+<a name="konfiguration-des-webservice-und-clients" class="anchor" href="#konfiguration-des-webservice-und-clients"><span class="octicon octicon-link"></span></a>Konfiguration des Webservice und Clients</h3>
+
+<p>Die Konfiguration des Webservice und der Clients bezüglich Credentials für das Google Developer Projekt und Facebook App, sowie Adressen (Server IP/Port) und Spieleeinstellungen sind als Klassenattribute in den Klassen(-dateien):</p>
+
+<ul>
+<li>src/de/tum/socialcomp/android/Configuration.java für den Client</li>
+<li>app/util/GameConfiguration.java</li>
+</ul><p>einzusehen und entsprechend zu modifizieren. Die Kommentare sollten hierbei selbsterklärend sein.</p>
+
+<h2>
+<a name="technische-anmerkungen" class="anchor" href="#technische-anmerkungen"><span class="octicon octicon-link"></span></a>Technische Anmerkungen</h2>
+
+<p>Dieser Abschnitt dient dazu Hinweise bezüglich der Implementierung zu geben, um Ihnen Ihre Implementierung zu erleichtern. Wir behalten uns vor, diesn Abschnitt im Laufe des Praktikums sukzessive zu erweitern und anzupassen. Dies wird durch entsprechende Versionierung dokumentiert. </p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/tum-social-gaming-praktikum/documentation/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/tum-social-gaming-praktikum/documentation/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/tum-social-gaming-praktikum/documentation"></a> is maintained by <a href="https://github.com/tum-social-gaming-praktikum">tum-social-gaming-praktikum</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
