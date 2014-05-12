@@ -29,7 +29,7 @@
       </header>
       <section>
         <h1>
-<a name="aufgabe-2-rev-1" class="anchor" href="#aufgabe-2-rev-1"><span class="octicon octicon-link"></span></a>Aufgabe 2 (rev. 1)</h1>
+<a name="aufgabe-2-rev-2" class="anchor" href="#aufgabe-2-rev-2"><span class="octicon octicon-link"></span></a>Aufgabe 2 (rev. 2)</h1>
 
 <p>Bemerkung: In dieser Aufgabenbeschreibung sind, sofern aus Gründen der Lesbarkeit männliche Bezeichner für Menschen benutzt werden, stets beide Geschlechter gemeint. </p>
 
@@ -110,7 +110,7 @@ Abbildung 1a beinhaltet hier die Hauptansichten, das sogenannte MainFragment mit
 
 <p>Ihnen ist freigestellt, andere Technologien zu verwenden, sofern dies ausreichend dokumentiert ist. Wir können Ihnen dafür jedoch keine aktive Unterstützung bieten.</p>
 
-<p>Der Client ist für Android 4.2+ implementiert, der Webservice verwendet das Play Framework 2.2, beide Komponenten machen demnach von der Programmiersprache Java Gebrauch - mit dieser hatten Sie im Laufe Ihres Studiums hinreichend Kontakt. </p>
+<p>Der Client ist für Android 4.1+ implementiert, der Webservice verwendet das Play Framework 2.2, beide Komponenten machen demnach von der Programmiersprache Java Gebrauch - mit dieser hatten Sie im Laufe Ihres Studiums hinreichend Kontakt. </p>
 
 <p>Die Client-Server Architektur folgt den Prinzipien eines modernen RESTful Services (<a href="http://en.wikipedia.org/wiki/Representational_state_transfer">http://en.wikipedia.org/wiki/Representational_state_transfer</a>), d.h. sie folgt der Idee der Separation of Concerns, so dass:</p>
 
@@ -271,12 +271,23 @@ bei <a href="https://developers.facebook.com">https://developers.facebook.com</a
 <ul>
 <li>src/de/tum/socialcomp/android/Configuration.java für den Client</li>
 <li>app/util/GameConfiguration.java</li>
-</ul><p>einzusehen und entsprechend zu modifizieren. Die Kommentare sollten hierbei selbsterklärend sein.</p>
+</ul><p>einzusehen und entsprechend zu modifizieren. Die Kommentare sollten hierbei selbsterklärend sein. Desweiteren ist in der Datei:</p>
+
+<ul>
+<li>res/values/strings.xml</li>
+</ul><p>im Repository des Clients noch der Facebook Application ID in der String-Definition <em>app_id</em> einzutragen (dieser wird vom zu importierenden Facebook SDK verwendet).</p>
 
 <h2>
 <a name="technische-anmerkungen" class="anchor" href="#technische-anmerkungen"><span class="octicon octicon-link"></span></a>Technische Anmerkungen</h2>
 
-<p>Dieser Abschnitt dient dazu Hinweise bezüglich der Implementierung zu geben, um Ihnen Ihre Implementierung zu erleichtern. Wir behalten uns vor, diesn Abschnitt im Laufe des Praktikums sukzessive zu erweitern und anzupassen. Dies wird durch entsprechende Versionierung dokumentiert. </p>
+<p>Dieser Abschnitt dient dazu Hinweise bezüglich der Implementierung zu geben, um Ihnen Ihre Implementierung zu erleichtern. Wir behalten uns vor, diesen Abschnitt im Laufe des Praktikums sukzessive zu erweitern und anzupassen. Dies wird durch entsprechende Versionierung dokumentiert. </p>
+
+<p>Problem:</p>
+
+<ul>
+<li>Client startet und es wird die Exception API Exception: KeyHash [...] geworfen: Überprüfen ob der richtige Facebook App ID in res/values/strings.xml und
+der angegebene KeyHash in der Developer Console von Facebook im Projekt eingetragen wurde, sowie die entsprechenden User als Developer/Tester vermerkt sind.</li>
+</ul>
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/tum-social-gaming-praktikum">tum-social-gaming-praktikum</a></p>
